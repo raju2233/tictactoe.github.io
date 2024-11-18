@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import GameGrid from "./GameGrid.js";
 
 function Game() {
@@ -29,7 +29,7 @@ function Game() {
    }
 
    function gridClick(whichSquare) {
-      if (winner || moves[whichSquare] !== "") return; // Ignore clicks if game is over or square is taken
+      if (winner || moves[whichSquare] !== "" || turn === "O") return; // Ignore clicks if game is over, square is taken, or it's not the player's turn
 
       const movesCopy = [...moves];
       movesCopy[whichSquare] = turn;
@@ -40,9 +40,7 @@ function Game() {
          setWinner(currentWinner); // Set the winner if found
       } else {
          // Alternate turns
-         if (turn === "X") {
-            setTurn("O");
-         }
+         setTurn("O");
       }
    }
 
@@ -67,18 +65,21 @@ function Game() {
       return moves;
    }
 
-   React.useEffect(() => {
+   // Handle computer's turn
+   useEffect(() => {
       if (turn === "O" && !winner) {
-         const movesCopy = [...moves];
-         const updatedMoves = computerMove(movesCopy);
-         setMoves(updatedMoves);
+         setTimeout(() => {
+            const movesCopy = [...moves];
+            const updatedMoves = computerMove(movesCopy);
+            setMoves(updatedMoves);
 
-         const currentWinner = checkWinner(updatedMoves);
-         if (currentWinner) {
-            setWinner(currentWinner); // Set the winner if computer wins
-         } else {
-            setTurn("X"); // Pass turn back to player
-         }
+            const currentWinner = checkWinner(updatedMoves);
+            if (currentWinner) {
+               setWinner(currentWinner); // Set the winner if computer wins
+            } else {
+               setTurn("X"); // Pass turn back to player
+            }
+         }, 500); // Add a slight delay for better UX
       }
    }, [turn, moves, winner]);
 
